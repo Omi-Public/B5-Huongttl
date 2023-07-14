@@ -1,5 +1,6 @@
 var bodyParser = require('body-parser');
 const {connection} = require('./db');
+const md5 = require('md5');
 var express = require('express');
 var app = express();
 
@@ -7,14 +8,14 @@ var app = express();
 app.use(bodyParser.json());
 
 app.post('/signup', async function (req, res) {
-  var username = req.body.username;
-  var password = req.body.password;
-  var age = req.body.age;
-  var hometown = req.body.hometown;
-  var birthday = req.body.birthday;
-  connection.query('INSERT INTO tbl_user (username, password, age, hometown, birthday) VALUES ("huongttlxyzzzz", MD5("123456"), "15", "Hanoi", "1997-07-15")', 
-  [username, password, age, hometown, birthday],function (error, results, fields) {
-    res.send(`1 record inserted`);
+  var username = req.query.username;
+  var password = req.query.password;
+  var age = req.query.age;
+  var hometown = req.query.hometown;
+  var birthday = req.query.birthday;
+  connection.query('INSERT INTO tbl_user ("username","password","age","hometown","birthday") VALUES (?,?,?,?,?)', 
+  [username, md5(password), age, hometown, birthday], function (error, results, fields) {
+    res.send(results);
     });
   });
 
@@ -26,11 +27,10 @@ app.post('/signup', async function (req, res) {
   });
 
 app.post('/login', async function (req, res) {
-  var username = req.body.username;
-  var password = req.body.password;
+  var username = req.query.username;
+  var password = req.query.password;
   console.log (username, password);
-  connection.query('SELECT * FROM tbl_user where username = ? AND password = MD5(?)',[username, password],function (error, results, fields) {
-    if (error) throw error;
+  connection.query('SELECT * FROM tbl_user where username = ? AND password = md5(?)',[username, password],function (error, results, fields) {
     if(results && results.length > 0){
      res.send(`Xin chào ${results[0].username}`);
     }

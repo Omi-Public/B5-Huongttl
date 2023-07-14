@@ -1,5 +1,4 @@
 const mysql = require('mysql2');
-const md5 = require('md5');
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'huongttl',
